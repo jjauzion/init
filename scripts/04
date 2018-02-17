@@ -1,0 +1,23 @@
+#!/bin/bash
+
+RULE_PATH="/home/vagrant/04"
+
+crontab -l > mycron
+GREP=$(cat mycron | grep $RULE_PATH)
+if [ "$GREP" == "" ]
+then
+	echo "0 0 * * * $RULE_PATH" >> mycron
+	crontab mycron
+fi
+rm mycron
+
+FILE="/etc/crontab"
+EMAIL="jeremy.jauzion@gmail.com"
+AUTHKEY="8f111d100ea459f68d333d63a8ef2205"
+
+KEY=$(sudo md5sum $FILE | cut -d" " -f1)
+if [ "$KEY" != "$AUTHKEY" ]
+then
+	echo "File has been modified -> md5 key = $KEY" | mail -s "CRONTAB
+	FILE HAS BEEN MODIFIED" $EMAIL
+fi
