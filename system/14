@@ -1,1 +1,1 @@
-sudo kill $(ps aux | grep "sudo tail" | grep -v grep | tr -s " " | cut -d" " -f2)
+sudo tail -f /var/log/syslog &
