@@ -1,23 +1,28 @@
 #!/bin/bash
 
-RULE_PATH="/home/vagrant/04"
+RULE_PATH="/home/vagrant/init/scripts/04"
+RULE="0 0 * * * $RULE_PATH"
 
 crontab -l > mycron
-GREP=$(cat mycron | grep $RULE_PATH)
+GREP=$(cat mycron | grep "$RULE_PATH")
 if [ "$GREP" == "" ]
 then
-	echo "0 0 * * * $RULE_PATH" >> mycron
+	echo "$RULE" >> mycron
 	crontab mycron
 fi
 rm mycron
 
 FILE="/etc/crontab"
+TMPFILE="/etc/mycrontab.tmp"
 EMAIL="jeremy.jauzion@gmail.com"
-AUTHKEY="8f111d100ea459f68d333d63a8ef2205"
 
 KEY=$(sudo md5sum $FILE | cut -d" " -f1)
-if [ "$KEY" != "$AUTHKEY" ]
+if [ -f $TMPFILE ]
 then
-	echo "File has been modified -> md5 key = $KEY" | mail -s "CRONTAB
-	FILE HAS BEEN MODIFIED" $EMAIL
+	PREVKEY=$(cat $TMPFILE)
+	if [ "$KEY" != "$PREVKEY" ]
+	then
+		echo "File has been modified -> md5 key = $KEY" | mail -s "CRONTAB FILE HAS BEEN MODIFIED" $EMAIL
+	fi
 fi
+echo "$KEY" | sudo tee /etc/mycrontab.tmp > /dev/null
