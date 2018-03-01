@@ -1,6 +1,6 @@
 #!/bin/bash
 
-crontab -l > mycron
+crontab -l > mycron 2> /dev/null
 echo "0 4 * * sun sudo sh -c 'apt-get update && apt-get -y upgrade >> /var/log/update_script.log 2>&1'" >> mycron
 crontab mycron
 rm mycron

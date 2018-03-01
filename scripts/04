@@ -1,9 +1,11 @@
 #!/bin/bash
+# Edit root email in /etc/aliases. Add line:
+# root: email@domain.com
 
 RULE_PATH="/home/vagrant/init/scripts/04"
 RULE="0 0 * * * $RULE_PATH"
 
-crontab -l > mycron
+crontab -l > mycron 2> /dev/null
 GREP=$(cat mycron | grep "$RULE_PATH")
 if [ "$GREP" == "" ]
 then
@@ -14,7 +16,6 @@ rm mycron
 
 FILE="/etc/crontab"
 TMPFILE="/etc/mycrontab.tmp"
-EMAIL="jeremy.jauzion@gmail.com"
 
 KEY=$(sudo md5sum $FILE | cut -d" " -f1)
 if [ -f $TMPFILE ]
@@ -22,7 +23,7 @@ then
 	PREVKEY=$(cat $TMPFILE)
 	if [ "$KEY" != "$PREVKEY" ]
 	then
-		echo "File has been modified -> md5 key = $KEY" | mail -s "CRONTAB FILE HAS BEEN MODIFIED" $EMAIL
+		echo "File has been modified -> md5 key = $KEY" | mail -s "CRONTAB FILE HAS BEEN MODIFIED" root
 	fi
 fi
 echo "$KEY" | sudo tee /etc/mycrontab.tmp > /dev/null
